@@ -1,36 +1,27 @@
-% main.m
-%
-% Matlab script that calls all the functions for computing the optimal cost
-% and policy of the given problem.
-%
 % Dynamic Programming and Optimal Control
 % Fall 2019
 % Programming Exercise
 %
-% --
+% Solution by Yize Wang
+%
+% ------
 % ETH Zurich
 % Institute for Dynamic Systems and Control
 % Nikita Rudin
 % rudinn@ethz.ch
 % David Hoeller
 % dhoeller@ethz.ch
-%
-% --
-% Revision history
-% [ 18.11.2019, NR ]    1.0
-% [ 20.11.2019, DH ]    1.1
 
 %% Clear workspace and command window
+clc;
 clear all;
 close all;
-clc;
 
 %% Options
-% [M, N]
-mapSize = [15, 20];
+mapSize = [15, 20]; % [M, N]
 % Set to true to generate a random map of size mapSize, else set to false 
 % to load the pre-exsisting example map
-generateRandomWorld = true;
+generateRandomWorld = false;
 
 % Plotting options
 global PLOT_POLICY PLOT_COST
@@ -38,7 +29,6 @@ PLOT_POLICY = true;
 PLOT_COST = false;
 
 %% Global problem parameters
-% IMPORTANT: Do not add or remove any global parameter in main.m
 global GAMMA R Nc P_WIND
 GAMMA  = 0.2; % Shooter gamma factor
 R = 2; % Shooter range
@@ -67,7 +57,7 @@ HOVER = 5;
 % specified in the PDF.
 disp('Generate map');
 if generateRandomWorld
-	[map] = GenerateWorld(mapSize(1), mapSize(2));
+	map = GenerateWorld(mapSize(1), mapSize(2)); %#ok<*UNRCH>
 else
     % We can load a pre-generated map.
     load('exampleWorld.mat');
@@ -76,7 +66,7 @@ MakePlots(map);
 
 %% Generate state space
 disp('Generate state space');
-% Generate a (K x 3)-matrix 'stateSpace', where each accessible cell is
+% Generate a (K x 3) - matrix 'stateSpace', where each accessible cell is
 % represented by two rows (with and without carrying a package).
 stateSpace = [];
 for m = 1 : size(map, 1)
@@ -90,7 +80,7 @@ for m = 1 : size(map, 1)
 end
 % State space size
 global K
-K=size(stateSpace,1);
+K = size(stateSpace,1);
 
 %% Set the following to true as you progress with the files
 transitionProbabilitiesImplemented = false;
