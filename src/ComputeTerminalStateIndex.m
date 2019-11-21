@@ -21,17 +21,17 @@ function stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 
 % find drop off position
 global DROP_OFF
-[m,n] = find(map==DROP_OFF);
+[dropM,dropN] = find(map==DROP_OFF);
 
 % check existence and uniqueness of drop off position
-if isempty(m)
+if isempty(dropM)
     error('Error: Invalid Map (No Drop Off Position)');
-elseif (size(m,1)>1)
-    error('Error: Invalid Map (Multiple Drop Off Position)');
+elseif (size(dropM,1)>1)
+    error('Error: Invalid Map (Multiple Drop Off Positions)');
 end
 
 % find terminal state index
-[~, stateIndex] = ismember([m,n,1], stateSpace, 'row');
+[~, stateIndex] = ismember([dropM,dropN,1], stateSpace, 'row');
 
 % error if no index found
 if ~stateIndex

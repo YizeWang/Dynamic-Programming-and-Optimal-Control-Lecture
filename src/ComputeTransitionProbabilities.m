@@ -33,7 +33,7 @@ P = zeros(K, K, 5); % final transition matrix
 P1 = zeros(K, K, 5); % transition matrix in step 1
 
 % find naive transition matrix
-for i = 1:K
+for i = 1:K % time complexity: O(n2)
    for j = 1:K
        currPos = stateSpace(i,:); % current state
        nextPos = stateSpace(j,:); % next state
@@ -42,15 +42,15 @@ for i = 1:K
        packMove = nextPos(3) - currPos(3); % change in package state
        if packMove~=0 % should not pick package yet
            continue;
-       elseif horzMove== 1 && vertMove== 0 % move east
+       elseif horzMove== 1 && vertMove== 0 % east movement detected
            P1(i,j,EAST) = 1;
-       elseif horzMove==-1 && vertMove== 0 % move west
+       elseif horzMove==-1 && vertMove== 0 % west movement detected
            P1(i,j,WEST) = 1;
-       elseif horzMove== 0 && vertMove== 1 % move north
+       elseif horzMove== 0 && vertMove== 1 % north movement detected
            P1(i,j,NORTH) = 1;
-       elseif horzMove== 0 && vertMove==-1 % move south
+       elseif horzMove== 0 && vertMove==-1 % south movement detected
            P1(i,j,SOUTH) = 1;
-       elseif horzMove== 0 && vertMove== 0 % stay
+       elseif horzMove== 0 && vertMove== 0 % hover movement detected
            P1(i,j,HOVER) = 1;
        end
    end
@@ -64,37 +64,21 @@ clear vertMove;
 clear packMove;
 
 %% step 2: wind disturbance
-% compute number of barriers around states
-numBarr = zeros(K, 1); % vector of numbers of barriers around states
+% compute some constants
 M = size(map, 1); % map size in m direction
 N = size(map, 2); % map size in n direction
-for i = 1:K
-    currM = stateSpace(i,1); % current state in m
-    currN = stateSpace(i,2); % current state in n
-    % detect whether on the edge of m direction
-    if currM==1 || currM==M
-        numBarr(i) = numBarr(i) + 1;
-    end
-    % detect whether on the edge of n direction
-    if currN==1 || currN==N
-        numBarr(i) = numBarr(i) + 1;
-    end
-    % detect tree in north
-    if currN~=N && map(currM,currN+1)==TREE
-        numBarr(i) = numBarr(i) + 1;
-    end
-    % detect tree in south
-    if currN~=1 && map(currM,currN-1)==TREE
-        numBarr(i) = numBarr(i) + 1;
-    end
-    % detect tree in east
-    if currM~=M && map(currM+1,currN)==TREE
-        numBarr(i) = numBarr(i) + 1;
-    end
-    % detect tree in west
-    if currM~=1 && map(currM-1,currN)==TREE
-        numBarr(i) = numBarr(i) + 1;
-    end
+P_PEACE = 1 - P_WIND; % probability of a peaceful day
+
+% find base state index
+[baseM,baseN] = find(map==BASE);
+if isempty(baseM)
+    error('Error: Invalid Map (No Base)');
+elseif (size(baseM,1)>1)
+    error('Error: Invalid Map (Multiple Bases)');
+end
+[~, baseIndex] = ismember([baseM,baseN,0], stateSpace, 'row');
+if ~baseIndex
+    error('Error: State Space Constructed Wrongly')
 end
 
 %% step 3: angry resident gun shot

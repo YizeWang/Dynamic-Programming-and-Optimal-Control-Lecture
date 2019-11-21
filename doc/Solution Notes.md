@@ -35,3 +35,6 @@ Next, take the wind into account. Denote the number of adjacent trees by $T (0 \
 
 Finally, examine how many angry residents exist within $R$ cells. The probability of not being shot and thus staying there is $\Pi(1-P_{r_i})$.
 
+## Robustness Discussion
+
+- 
