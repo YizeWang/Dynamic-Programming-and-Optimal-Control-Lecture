@@ -38,3 +38,4 @@ Finally, examine how many angry residents exist within $R$ cells. The probabilit
 ## Robustness Discussion
 
 - 
+

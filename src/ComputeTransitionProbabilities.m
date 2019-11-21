@@ -63,7 +63,7 @@ clear horzMove;
 clear vertMove;
 clear packMove;
 
-%% step 2: wind disturbance
+%% step 2: wind disturbance and angry resident shot
 % compute some constants
 M = size(map, 1); % map size in m direction
 N = size(map, 2); % map size in n direction
@@ -81,15 +81,27 @@ if ~baseIndex
     error('Error: State Space Constructed Wrongly')
 end
 
+% find shooters
+[shooterM, shooterN] = find(map==SHOOTER); % find m and n of shooters
+shooterPos = [shooterM, shooterN]; % shooter positions
+
 % compute transition matrix after wind
 for i = 1:K % iterate starting state
     for j = 1:K % iteratre ending state
         for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
             if P1(i,j,k)==1 % when naive movement valid
-                P2(i,j,k) = P2(i,j,k) + P1(i,j,k) * (1 - P_WIND); % staying probability
+                P_SHOT = ComputeShotProbability(stateSpace, map, j, shooterPos); % if no wind, stay or be shot
+                P2(i,j,k) = P2(i,j,k) + (1 - P_WIND) * (1 - P_SHOT); % staying probability
+                P2(i,baseIndex,k) = P2(i,baseIndex,k) + (1 - P_WIND) * P_SHOT;
                 for windAction = [NORTH, SOUTH, EAST, WEST] % iterate wind actions
-                    nextStateIndex = FindIndex(stateSpace, map, baseIndex, j, windAction); % find next state resulting from wind
-                    P2(i,nextStateIndex,k) = P2(i,nextStateIndex,k) + P_WIND/4; % update transition matrix
+                    [isCrashed, nextStateIndex] = FindIndex(stateSpace, baseIndex, j, windAction); % find next state resulting from wind
+                    if isCrashed
+                        P2(i,baseIndex,k) = P2(i,baseIndex,k) + P_WIND/4; % return to base
+                    else
+                        P_SHOT = ComputeShotProbability(stateSpace, map, nextStateIndex, shooterPos);
+                        P2(i,nextStateIndex,k) = P2(i,nextStateIndex,k) + P_WIND/4*(1-P_SHOT);
+                        P2(i,baseIndex,k) = P2(i,baseIndex,k) + P_WIND/4*P_SHOT;
+                    end
                 end
             else
                 continue;
@@ -98,13 +110,37 @@ for i = 1:K % iterate starting state
     end
 end
 
-%% step 3: angry resident gun shot
+%% step 3: pick up package
+% find pick up position state index
+[pickM,pickN] = find(map==PICK_UP);
+if isempty(pickM)
+    error('Error: Invalid Map (No Pickup Position)');
+elseif (size(pickM,1)>1)
+    error('Error: Invalid Map (Multiple Pickup Positions)');
+end
+[~, pickIndex0] = ismember([pickM,pickN,0], stateSpace, 'row');
+if ~pickIndex0
+    error('Error: State Space Constructed Wrongly')
+end
+pickIndex1 = pickIndex0 + 1;
 
-%% step 4: pick up package
+% compute final transition probability matrix
+for i = 1:K % iterate starting state
+    for j = 1:K % iteratre ending state
+        for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
+            if j==pickIndex0
+                P(i,pickIndex1,k) = P(i,pickIndex1,k) + P(i,pickIndex0,k);
+                P(i,pickIndex0,k) = 0;
+            else
+                P(i,j,k) = P2(i,j,k);
+            end
+        end
+    end
+end
 
 end
 
-function nextStateIndex = FindIndex(stateSpace, map, baseIndex, currState, action)
+function [isCrashed, nextStateIndex] = FindIndex(stateSpace, baseIndex, currState, action)
 % FindIndex Compute the index in stateSpace of next state if action applied
 %
 %   nextStateIndex = FindIndex(stateSpace, map, action)
@@ -115,9 +151,6 @@ function nextStateIndex = FindIndex(stateSpace, map, baseIndex, currState, actio
 %       stateSpace:
 %           A (K x 3) - matrix, where the i-th row represents the i-th
 %           element of the state space.
-%       map:
-%           A (M x N) - matrix describing the world. With
-%           values: FREE TREE SHOOTER PICK_UP DROP_OFF BASE
 %       baseIndex:
 %           A scalar representing the index in stateSpace of base state
 %       currState:
@@ -126,6 +159,8 @@ function nextStateIndex = FindIndex(stateSpace, map, baseIndex, currState, actio
 %           A scalar representing the action
 %
 %   Output arguments:
+%       isCrashed:
+%           A boolean that indicates whether the drone is crashed
 %       nextStateIndex:
 %           A scalar representing the index in stateSpace of next state 
 %           if action applied. Return the base state index if next state
@@ -138,6 +173,7 @@ global NORTH SOUTH EAST WEST HOVER
 global K TERMINAL_STATE_INDEX
 
 %% parse information
+isCrashed = false; % not crashed by default
 currM = stateSpace(currState, 1); % current state in m
 currN = stateSpace(currState, 2); % current state in n
 currPsi = stateSpace(currState, 3); % current state in psi
@@ -153,6 +189,65 @@ elseif action==WEST && ismember([currM-1,currN,currPsi],stateSpace,'row')
     [~, nextStateIndex] = ismember([currM-1,currN,currPsi],stateSpace,'row');
 else
     nextStateIndex = baseIndex; % if crash into next state, return to base
+    isCrashed = true;
 end
+
+end
+
+function P_SHOT = ComputeShotProbability(stateSpace, map, currState, shooterPos)
+% ComputeShotProbability Compute the probability of being shot
+%
+%   P_SHOT = ComputeShotProbability(stateSpace, map, currState, shooterPos)
+%   Compute the probability of being shot by a angry resident
+%
+%   Input arguments:
+%       stateSpace:
+%           A (K x 3) - matrix, where the i-th row represents the i-th
+%           element of the state space.
+%       map:
+%           A (M x N) - matrix describing the world. With
+%           values: FREE TREE SHOOTER PICK_UP DROP_OFF BASE
+%       currState:
+%           A scalar representing the index in stateSpace of current state
+%       shooterPos:
+%           A matrix where the i-th row represent the i-th shoot position
+%
+%   Output arguments:
+%       P_SHOT:
+%       The probability of beging shot by a angry resident
+
+%% declare global variables
+global GAMMA R P_WIND
+global FREE TREE SHOOTER PICK_UP DROP_OFF BASE
+global NORTH SOUTH EAST WEST HOVER
+global K TERMINAL_STATE_INDEX
+
+%% parse information
+currM = stateSpace(currState, 1); % current state in m
+currN = stateSpace(currState, 2); % current state in n
+numShooter = size(shooterPos, 1); % shooter number
+
+%% compute distance
+Distance = zeros(numShooter, 1); % initialize distance vector
+for i = 1:numShooter
+    shooterM = shooterPos(i, 1); % m of i-th shooter
+    shooterN = shooterPos(i, 2); % n of i-th shooter
+    Distance(i) = abs(shooterM-currM) + abs(shooterN-currN);
+end
+
+%% compute probability of being shot by each shooter
+shotP = zeros(numShooter, 1); % initialize shot probability vector
+for i = 1:numShooter
+    if Distance(i)>=0 && Distance(i)<=R
+        shotP(i) = GAMMA/(Distance(i)+1);
+    else
+        shotP(i) = 0;
+    end
+end
+
+%% compute probability of being shot
+notShotP = 1 - shotP; % probability of not being shot by each shooter
+P_NOT_SHOT = prod(notShotP); % probability of not being shot by all shooters
+P_SHOT = 1 - P_NOT_SHOT; % probability of being shot by at least one shooter
 
 end

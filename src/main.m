@@ -83,7 +83,7 @@ global K
 K = size(stateSpace,1);
 
 %% Set the following to true as you progress with the files
-transitionProbabilitiesImplemented = false;
+transitionProbabilitiesImplemented = true;
 stageCostsImplemented = false;
 valueIterationImplemented = false; 
 policyIterationImplemented = false;
@@ -98,13 +98,6 @@ end
 %% Compute transition probabilities
 if transitionProbabilitiesImplemented
     disp('Compute transition probabilities');
-    % Compute the transition probabilities between all states in the
-    % state space for all control inputs.
-    % The transition probability matrix has the dimension (K x K x L), i.e.
-    % the entry P(i, j, l) representes the transition probability from state i
-    % to state j if control input l is applied.
-    
-    % TODO: Question b)
     P = ComputeTransitionProbabilities(stateSpace, map);
 end
 
