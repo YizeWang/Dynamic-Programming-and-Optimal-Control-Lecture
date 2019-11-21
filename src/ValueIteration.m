@@ -1,5 +1,5 @@
-function [ J_opt, u_opt_ind ] = ValueIteration(P, G)
-%VALUEITERATION Value iteration
+function [J_opt, u_opt_ind] = ValueIteration(P, G)
+% VALUEITERATION Value iteration
 %   Solve a stochastic shortest path problem by Value Iteration.
 %
 %   [J_opt, u_opt_ind] = ValueIteration(P, G) computes the optimal cost and

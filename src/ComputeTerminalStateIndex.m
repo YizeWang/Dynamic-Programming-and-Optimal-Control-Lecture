@@ -2,7 +2,7 @@ function stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 % ComputeTerminalStateIndex Compute the index of the terminal state in the
 % stateSpace matrix
 %
-%   stateIndex = ComputeTerminalStateIndex(stateSpace, map) 
+%   stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 %   Computes the index of the terminal state in the stateSpace matrix
 %
 %   Input arguments:
@@ -20,17 +20,17 @@ function stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 
 % find drop off position
 global DROP_OFF
-[dropM,dropN] = find(map==DROP_OFF);
+[dropM, dropN] = find( map == DROP_OFF );
 
 % check existence and uniqueness of drop off position
 if isempty(dropM)
     error('Error: Invalid Map (No Drop Off Position)');
-elseif (size(dropM,1)>1)
+elseif ( size(dropM, 1) > 1 )
     error('Error: Invalid Map (Multiple Drop Off Positions)');
 end
 
 % find terminal state index
-[~, stateIndex] = ismember([dropM,dropN,1], stateSpace, 'row');
+[~, stateIndex] = ismember([dropM, dropN, 1], stateSpace, 'row');
 
 % error if no index found
 if ~stateIndex

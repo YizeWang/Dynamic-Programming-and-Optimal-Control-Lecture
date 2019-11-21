@@ -19,7 +19,7 @@ close all;
 
 %% Options
 mapSize = [15, 20]; % [M, N]
-% Set to true to generate a random map of size mapSize, else set to false 
+% Set to true to generate a random map of size mapSize, else set to false
 % to load the pre-exsisting example map
 generateRandomWorld = false;
 
@@ -54,12 +54,11 @@ HOVER = 5;
 
 %% Generate map
 % map(m,n) represents the cell at indices (m,n) according to the axes
-% specified in the PDF.
 disp('Generate map');
 if generateRandomWorld
 	map = GenerateWorld(mapSize(1), mapSize(2)); %#ok<*UNRCH>
 else
-    % We can load a pre-generated map.
+    % load a pre-generated map
     load('exampleWorld.mat');
 end
 MakePlots(map);
@@ -93,7 +92,7 @@ linearProgrammingImplemented = false;
 global TERMINAL_STATE_INDEX %#ok<*NUSED>
 if transitionProbabilitiesImplemented
     TERMINAL_STATE_INDEX = ComputeTerminalStateIndex(stateSpace, map);
-end                  
+end
 
 %% Compute transition probabilities
 if transitionProbabilitiesImplemented

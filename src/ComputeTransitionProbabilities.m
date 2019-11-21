@@ -22,7 +22,7 @@ function P = ComputeTransitionProbabilities(stateSpace, map)
 %           from state i to state j if control input l is applied.
 
 %% declare global variables
-global GAMMA R P_WIND P_PEACE 
+global GAMMA R P_WIND P_PEACE  %#ok<*NUSED>
 global FREE TREE SHOOTER PICK_UP DROP_OFF BASE
 global NORTH SOUTH EAST WEST HOVER
 global K TERMINAL_STATE_INDEX
@@ -40,18 +40,18 @@ for i = 1:K % time complexity: O(n2)
        horzMove = nextPos(1) - currPos(1); % movement along m direction
        vertMove = nextPos(2) - currPos(2); % movement along n direction
        packMove = nextPos(3) - currPos(3); % change in package state
-       if packMove~=0 % should not pick package yet
+       if ( packMove ~= 0 ) % should not pick package yet
            continue;
-       elseif horzMove== 1 && vertMove== 0 % east movement detected
-           P1(i,j,EAST) = 1;
-       elseif horzMove==-1 && vertMove== 0 % west movement detected
-           P1(i,j,WEST) = 1;
-       elseif horzMove== 0 && vertMove== 1 % north movement detected
-           P1(i,j,NORTH) = 1;
-       elseif horzMove== 0 && vertMove==-1 % south movement detected
-           P1(i,j,SOUTH) = 1;
-       elseif horzMove== 0 && vertMove== 0 % hover movement detected
-           P1(i,j,HOVER) = 1;
+       elseif ( horzMove == 1 && vertMove == 0 ) % east movement detected
+           P1(i, j, EAST) = 1;
+       elseif ( horzMove == -1 && vertMove == 0 ) % west movement detected
+           P1(i, j, WEST) = 1;
+       elseif ( horzMove == 0 && vertMove== 1 ) % north movement detected
+           P1(i, j, NORTH) = 1;
+       elseif ( horzMove== 0 && vertMove== -1 ) % south movement detected
+           P1(i, j, SOUTH) = 1;
+       elseif ( horzMove == 0 && vertMove == 0 ) % hover movement detected
+           P1(i, j, HOVER) = 1;
        end
    end
 end
@@ -70,26 +70,26 @@ N = size(map, 2); % map size in n direction
 P_PEACE = 1 - P_WIND; % probability of a peaceful day
 
 % find base state index
-[baseM,baseN] = find(map==BASE);
+[baseM, baseN] = find( map == BASE );
 if isempty(baseM)
     error('Error: Invalid Map (No Base)');
-elseif (size(baseM,1)>1)
+elseif ( size(baseM, 1) > 1 )
     error('Error: Invalid Map (Multiple Bases)');
 end
-[~, baseIndex] = ismember([baseM,baseN,0], stateSpace, 'row');
+[~, baseIndex] = ismember([baseM, baseN, 0], stateSpace, 'row');
 if ~baseIndex
     error('Error: State Space Constructed Wrongly')
 end
 
 % find shooters
-[shooterM, shooterN] = find(map==SHOOTER); % find m and n of shooters
+[shooterM, shooterN] = find( map == SHOOTER ); % find m and n of shooters
 shooterPos = [shooterM, shooterN]; % shooter positions
 
 % compute transition matrix after wind
 for i = 1:K % iterate starting state
     for j = 1:K % iteratre ending state
         for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
-            if P1(i,j,k)==1 % when naive movement valid
+            if ( P1(i,j,k) == 1 ) % when naive movement valid
                 P_SHOT = ComputeShotProbability(stateSpace, map, j, shooterPos); % if no wind, stay or be shot
                 P2(i,j,k) = P2(i,j,k) + (1 - P_WIND) * (1 - P_SHOT); % staying probability
                 P2(i,baseIndex,k) = P2(i,baseIndex,k) + (1 - P_WIND) * P_SHOT;
@@ -112,23 +112,23 @@ end
 
 %% step 3: pick up package
 % find pick up position state index
-[pickM,pickN] = find(map==PICK_UP);
+[pickM, pickN] = find( map == PICK_UP );
 if isempty(pickM)
     error('Error: Invalid Map (No Pickup Position)');
-elseif (size(pickM,1)>1)
+elseif ( size(pickM, 1) > 1 )
     error('Error: Invalid Map (Multiple Pickup Positions)');
 end
-[~, pickIndex0] = ismember([pickM,pickN,0], stateSpace, 'row');
+[~, pickIndex0] = ismember([pickM ,pickN ,0], stateSpace, 'row'); % index of state: pickup position without package
 if ~pickIndex0
     error('Error: State Space Constructed Wrongly')
 end
-pickIndex1 = pickIndex0 + 1;
+pickIndex1 = pickIndex0 + 1; % index of state: pickup position with package
 
 % compute final transition probability matrix
 for i = 1:K % iterate starting state
     for j = 1:K % iteratre ending state
         for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
-            if j==pickIndex0
+            if (j == pickIndex0)
                 P(i,pickIndex1,k) = P(i,pickIndex1,k) + P(i,pickIndex0,k);
                 P(i,pickIndex0,k) = 0;
             else
@@ -179,13 +179,13 @@ currN = stateSpace(currState, 2); % current state in n
 currPsi = stateSpace(currState, 3); % current state in psi
 
 %% compute next state
-if action==NORTH && ismember([currM,currN+1,currPsi],stateSpace,'row')
+if action == NORTH && ismember([currM,currN+1,currPsi],stateSpace,'row')
     [~, nextStateIndex] = ismember([currM,currN+1,currPsi],stateSpace,'row');
-elseif action==SOUTH && ismember([currM,currN-1,currPsi],stateSpace,'row')
+elseif action == SOUTH && ismember([currM,currN-1,currPsi],stateSpace,'row')
     [~, nextStateIndex] = ismember([currM,currN-1,currPsi],stateSpace,'row');
-elseif action==EAST && ismember([currM+1,currN,currPsi],stateSpace,'row')
+elseif action == EAST && ismember([currM+1,currN,currPsi],stateSpace,'row')
     [~, nextStateIndex] = ismember([currM+1,currN,currPsi],stateSpace,'row');
-elseif action==WEST && ismember([currM-1,currN,currPsi],stateSpace,'row')
+elseif action == WEST && ismember([currM-1,currN,currPsi],stateSpace,'row')
     [~, nextStateIndex] = ismember([currM-1,currN,currPsi],stateSpace,'row');
 else
     nextStateIndex = baseIndex; % if crash into next state, return to base
@@ -238,7 +238,7 @@ end
 %% compute probability of being shot by each shooter
 shotP = zeros(numShooter, 1); % initialize shot probability vector
 for i = 1:numShooter
-    if Distance(i)>=0 && Distance(i)<=R
+    if ( Distance(i) >= 0 && Distance(i) <= R )
         shotP(i) = GAMMA/(Distance(i)+1);
     else
         shotP(i) = 0;
