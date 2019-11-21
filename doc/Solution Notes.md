@@ -34,3 +34,4 @@ Second, consider only the action we take. The probability of ending in correspon
 Next, take the wind into account. Denote the number of adjacent trees by $T (0 \leq T \leq 4)$ ($T$ can be $4$ only when you are unluckily spawned in the middle of trees, in while case you will never complete the mission). The probability of staying at the current position becomes $1 - P_{wind}$ and you may end up in the base with a probability of $\frac{T}{4} \times P_{wind}$ because you can crash into the trees. If you are lucky that the drone does not crash, you have a probability of $\frac{4-T}{4} \times P_{wind}$ to arrive in an adjacent cell.
 
 Finally, examine how many angry residents exist within $R$ cells. The probability of not being shot and thus staying there is $\Pi(1-P_{r_i})$.
+

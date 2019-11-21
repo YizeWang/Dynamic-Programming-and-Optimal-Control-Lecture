@@ -90,11 +90,11 @@ policyIterationImplemented = false;
 linearProgrammingImplemented = false;
 
 %% Compute the terminal state index
-global TERMINAL_STATE_INDEX
+global TERMINAL_STATE_INDEX %#ok<*NUSED>
 if transitionProbabilitiesImplemented
-    % TODO: Question a)
     TERMINAL_STATE_INDEX = ComputeTerminalStateIndex(stateSpace, map);
 end                  
+
 %% Compute transition probabilities
 if transitionProbabilitiesImplemented
     disp('Compute transition probabilities');
