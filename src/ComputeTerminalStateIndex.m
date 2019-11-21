@@ -9,7 +9,6 @@ function stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 %       stateSpace:
 %           A (K x 3) - matrix, where the i-th row represents the i-th
 %           element of the state space.
-%
 %       map:
 %           A (M x N) - matrix describing the terrain of the estate map.
 %           With values: FREE TREE SHOOTER PICK_UP DROP_OFF BASE
