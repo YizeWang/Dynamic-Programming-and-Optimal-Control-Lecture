@@ -11,8 +11,8 @@ function stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 %           element of the state space.
 %
 %       map:
-%           A (M x N) - matrix describing the terrain of the estate map. With
-%           values: FREE TREE SHOOTER PICK_UP DROP_OFF BASE
+%           A (M x N) - matrix describing the terrain of the estate map.
+%           With values: FREE TREE SHOOTER PICK_UP DROP_OFF BASE
 %
 %   Output arguments:
 %       stateIndex:
@@ -35,5 +35,5 @@ end
 if ~stateIndex
     error('Error: State Space Constructed Wrongly')
 end
-                  
+
 end
