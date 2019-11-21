@@ -30,6 +30,7 @@ global K TERMINAL_STATE_INDEX
 %% step 1: undisturbed movement
 P = zeros(K, K, 5); % final transition matrix
 P1 = zeros(K, K, 5); % transition matrix in step 1
+P2 = zeros(K, K, 5); % transition matrix in step 2
 
 % find naive transition matrix
 for i = 1:K % time complexity: O(n2)
@@ -81,7 +82,21 @@ if ~baseIndex
 end
 
 % compute transition matrix after wind
-P2 = P1 * P_PEACE; % initialize P2
+for i = 1:K % iterate starting state
+    for j = 1:K % iteratre ending state
+        for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
+            if P1(i,j,k)==1 % when naive movement valid
+                P2(i,j,k) = P2(i,j,k) + P1(i,j,k) * (1 - P_WIND); % staying probability
+                for windAction = [NORTH, SOUTH, EAST, WEST] % iterate wind actions
+                    nextStateIndex = FindIndex(stateSpace, map, baseIndex, j, windAction); % find next state resulting from wind
+                    P2(i,nextStateIndex,k) = P2(i,nextStateIndex,k) + P_WIND/4; % update transition matrix
+                end
+            else
+                continue;
+            end
+        end
+    end
+end
 
 %% step 3: angry resident gun shot
 
