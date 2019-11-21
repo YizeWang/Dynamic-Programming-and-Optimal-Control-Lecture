@@ -29,8 +29,8 @@ global NORTH SOUTH EAST WEST HOVER
 global K TERMINAL_STATE_INDEX
 
 %% step 1: undisturbed movement
-% initialize transition matrix
-P = zeros(K, K, 5);
+P = zeros(K, K, 5); % final transition matrix
+P1 = zeros(K, K, 5); % transition matrix in step 1
 
 % find naive transition matrix
 for i = 1:K
@@ -40,21 +40,62 @@ for i = 1:K
        horzMove = nextPos(1) - currPos(1); % movement along m direction
        vertMove = nextPos(2) - currPos(2); % movement along n direction
        packMove = nextPos(3) - currPos(3); % change in package state
-       if horzMove==1 && vertMove==0 % move east
-           P(i,j,EAST) = 1;
-       elseif horzMove==-1 && vertMove==0 % move west
-           P(i,j,WEST) = 1;
-       elseif horzMove==0 && vertMove==1 % move north
-           P(i,j,NORTH) = 1;
-       elseif horzMove==0 && vertMove==-1 % move south
-           P(i,j,SOUTH) = 1;
-       elseif horzMove==0 && vertMove==0 && packMove==0 % stay
-           P(i,j,HOVER) = 1;
+       if packMove~=0 % should not pick package yet
+           continue;
+       elseif horzMove== 1 && vertMove== 0 % move east
+           P1(i,j,EAST) = 1;
+       elseif horzMove==-1 && vertMove== 0 % move west
+           P1(i,j,WEST) = 1;
+       elseif horzMove== 0 && vertMove== 1 % move north
+           P1(i,j,NORTH) = 1;
+       elseif horzMove== 0 && vertMove==-1 % move south
+           P1(i,j,SOUTH) = 1;
+       elseif horzMove== 0 && vertMove== 0 % stay
+           P1(i,j,HOVER) = 1;
        end
    end
 end
 
+% clear used variables
+clear currPos;
+clear nextPos;
+clear horzMove;
+clear vertMove;
+clear packMove;
+
 %% step 2: wind disturbance
+% compute number of barriers around states
+numBarr = zeros(K, 1); % vector of numbers of barriers around states
+M = size(map, 1); % map size in m direction
+N = size(map, 2); % map size in n direction
+for i = 1:K
+    currM = stateSpace(i,1); % current state in m
+    currN = stateSpace(i,2); % current state in n
+    % detect whether on the edge of m direction
+    if currM==1 || currM==M
+        numBarr(i) = numBarr(i) + 1;
+    end
+    % detect whether on the edge of n direction
+    if currN==1 || currN==N
+        numBarr(i) = numBarr(i) + 1;
+    end
+    % detect tree in north
+    if currN~=N && map(currM,currN+1)==TREE
+        numBarr(i) = numBarr(i) + 1;
+    end
+    % detect tree in south
+    if currN~=1 && map(currM,currN-1)==TREE
+        numBarr(i) = numBarr(i) + 1;
+    end
+    % detect tree in east
+    if currM~=M && map(currM+1,currN)==TREE
+        numBarr(i) = numBarr(i) + 1;
+    end
+    % detect tree in west
+    if currM~=1 && map(currM-1,currN)==TREE
+        numBarr(i) = numBarr(i) + 1;
+    end
+end
 
 %% step 3: angry resident gun shot
 

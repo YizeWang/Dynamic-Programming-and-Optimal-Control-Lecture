@@ -22,6 +22,8 @@ function stateIndex = ComputeTerminalStateIndex(stateSpace, map)
 % find drop off position
 global DROP_OFF
 [m,n] = find(map==DROP_OFF);
+
+% check existence and uniqueness of drop off position
 if isempty(m)
     error('Error: Invalid Map (No Drop Off Position)');
 elseif (size(m,1)>1)
