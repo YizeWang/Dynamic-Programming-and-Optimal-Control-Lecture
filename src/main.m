@@ -155,31 +155,11 @@ end
 %% Terminated
 disp('Terminated');
 
+myP = P;
+load('exampleP.mat')
+
 myG = G;
 load('exampleG.mat');
 
-numINFG = 0;
-numINFmyG = 0;
-
-for i = 1:size(stateSpace,1)
-    for k = 1:5
-        numINFG = numINFG + isinf(G(i,k));
-        G(i,k) = 0;
-        numINFmyG = numINFmyG + isinf(myG(i,k));
-        myG(i,k) = 0;
-    end
-end
-
-numINFG == numINFmyG
-
-diff = G - myG;
-tol = 1e-5;
-for i = 1:size(stateSpace,1)
-    for k = 1:5
-        if diff(i,k) < tol
-            diff(i,k) = 0;
-        end
-    end
-end
-
-[x,y] = find(diff)
+CompareResultP(P,myP)
+CompareResultG(G,myG)
