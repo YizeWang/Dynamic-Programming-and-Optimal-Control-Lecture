@@ -83,7 +83,7 @@ K = size(stateSpace,1);
 
 %% Set the following to true as you progress with the files
 transitionProbabilitiesImplemented = true;
-stageCostsImplemented = false;
+stageCostsImplemented = true;
 valueIterationImplemented = false; 
 policyIterationImplemented = false;
 linearProgrammingImplemented = false;
@@ -103,12 +103,6 @@ end
 %% Compute stage costs
 if stageCostsImplemented 
     disp('Compute stage costs');
-    % Compute the stage costs for all states in the state space for all
-    % control inputs.
-    % The stage cost matrix has the dimension (K x L), i.e. the entry G(i, l)
-    % represents the cost if we are in state i and apply control input l.
-    
-    % TODO: Question c)
     G = ComputeStageCosts(stateSpace, map);
 end
 
@@ -161,20 +155,16 @@ end
 %% Terminated
 disp('Terminated');
 
-myP = P;
-load('exampleP.mat');
-diffP1 = P(:,:,1) - myP(:,:,1);
-diffP2 = P(:,:,2) - myP(:,:,2);
-diffP3 = P(:,:,3) - myP(:,:,3);
-diffP4 = P(:,:,4) - myP(:,:,4);
-diffP5 = P(:,:,5) - myP(:,:,5);
-[x1,y1] = find(diffP1);
-[x2,y2] = find(diffP2);
-[x3,y3] = find(diffP3);
-[x4,y4] = find(diffP4);
-[x5,y5] = find(diffP5);
-diff1 = [x1 y1]
-diff2 = [x2 y2]
-diff3 = [x3 y3]
-diff4 = [x4 y4]
-diff5 = [x5 y5]
+myG = G;
+load('exampleG.mat');
+
+numINFG = 0;
+numINFmyG = 0;
+
+for i = 1:size(stateSpace,1)
+    for k = 1:5
+        numINFG = numINFG + isinf(G(i,k));
+        numINFmyG = numINFmyG + isinf(myG(i,k));
+    end
+end
+        
