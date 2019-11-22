@@ -89,16 +89,18 @@ shooterPos = [shooterM, shooterN]; % shooter positions
 for i = 1:K % iterate starting state
     for j = 1:K % iteratre ending state
         for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
-            if ( P1(i,j,k) == 1 ) % when naive movement valid
-                P_SHOT = ComputeShotProbability(stateSpace, map, j, shooterPos); % if no wind, stay or be shot
-                P2(i,j,k) = P2(i,j,k) + (1 - P_WIND) * (1 - P_SHOT); % staying probability
-                P2(i,baseIndex,k) = P2(i,baseIndex,k) + (1 - P_WIND) * P_SHOT;
+            if i == TERMINAL_STATE_INDEX % do not move if mission completed
+                P2(i,j,k) = (j == TERMINAL_STATE_INDEX);
+            elseif ( P1(i,j,k) == 1 ) % when naive movement valid
+                P_SHOT = ComputeShotProbability(stateSpace, j, shooterPos); % if no wind, stay or be shot
+                P2(i,j,k) = P2(i,j,k) + (1 - P_WIND) * (1 - P_SHOT); % no wind and no shot
+                P2(i,baseIndex,k) = P2(i,baseIndex,k) + (1 - P_WIND) * P_SHOT; % no wind but shot
                 for windAction = [NORTH, SOUTH, EAST, WEST] % iterate wind actions
-                    [isCrashed, nextStateIndex] = FindIndex(stateSpace, baseIndex, j, windAction); % find next state resulting from wind
+                    [isCrashed, nextStateIndex] = FindNextStateIndex(stateSpace, baseIndex, j, windAction); % find next state resulting from wind
                     if isCrashed
                         P2(i,baseIndex,k) = P2(i,baseIndex,k) + P_WIND/4; % return to base
                     else
-                        P_SHOT = ComputeShotProbability(stateSpace, map, nextStateIndex, shooterPos);
+                        P_SHOT = ComputeShotProbability(stateSpace, nextStateIndex, shooterPos);
                         P2(i,nextStateIndex,k) = P2(i,nextStateIndex,k) + P_WIND/4*(1-P_SHOT);
                         P2(i,baseIndex,k) = P2(i,baseIndex,k) + P_WIND/4*P_SHOT;
                     end
@@ -125,22 +127,30 @@ end
 pickIndex1 = pickIndex0 + 1; % index of state: pickup position with package
 
 % compute final transition probability matrix
+P = P2;
 for i = 1:K % iterate starting state
     for j = 1:K % iteratre ending state
         for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
-            if (j == pickIndex0)
-                P(i,pickIndex1,k) = P(i,pickIndex1,k) + P(i,pickIndex0,k);
+            if ( j == pickIndex0 )
+                P(i,pickIndex1,k) = P(i,pickIndex1,k) + P2(i,pickIndex0,k);
                 P(i,pickIndex0,k) = 0;
-            else
-                P(i,j,k) = P2(i,j,k);
             end
         end
     end
 end
 
+% note that it is impossible that the drone is at pick-up position but not
+% carrying a package, comment this loop if you want the same result as
+% exampleP.mat
+for j = 1:K % iteratre ending state
+    for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
+        P(pickIndex0,j,k) = 0;
+    end
 end
 
-function [isCrashed, nextStateIndex] = FindIndex(stateSpace, baseIndex, currState, action)
+end
+
+function [isCrashed, nextStateIndex] = FindNextStateIndex(stateSpace, baseIndex, currState, action)
 % FindIndex Compute the index in stateSpace of next state if action applied
 %
 %   nextStateIndex = FindIndex(stateSpace, map, action)
@@ -194,7 +204,7 @@ end
 
 end
 
-function P_SHOT = ComputeShotProbability(stateSpace, map, currState, shooterPos)
+function P_SHOT = ComputeShotProbability(stateSpace, currState, shooterPos)
 % ComputeShotProbability Compute the probability of being shot
 %
 %   P_SHOT = ComputeShotProbability(stateSpace, map, currState, shooterPos)
@@ -204,9 +214,6 @@ function P_SHOT = ComputeShotProbability(stateSpace, map, currState, shooterPos)
 %       stateSpace:
 %           A (K x 3) - matrix, where the i-th row represents the i-th
 %           element of the state space.
-%       map:
-%           A (M x N) - matrix describing the world. With
-%           values: FREE TREE SHOOTER PICK_UP DROP_OFF BASE
 %       currState:
 %           A scalar representing the index in stateSpace of current state
 %       shooterPos:

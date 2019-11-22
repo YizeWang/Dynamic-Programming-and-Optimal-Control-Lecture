@@ -160,3 +160,21 @@ end
 
 %% Terminated
 disp('Terminated');
+
+myP = P;
+load('exampleP.mat');
+diffP1 = P(:,:,1) - myP(:,:,1);
+diffP2 = P(:,:,2) - myP(:,:,2);
+diffP3 = P(:,:,3) - myP(:,:,3);
+diffP4 = P(:,:,4) - myP(:,:,4);
+diffP5 = P(:,:,5) - myP(:,:,5);
+[x1,y1] = find(diffP1);
+[x2,y2] = find(diffP2);
+[x3,y3] = find(diffP3);
+[x4,y4] = find(diffP4);
+[x5,y5] = find(diffP5);
+diff1 = [x1 y1]
+diff2 = [x2 y2]
+diff3 = [x3 y3]
+diff4 = [x4 y4]
+diff5 = [x5 y5]
