@@ -1,4 +1,4 @@
-function P_SHOT = ComputeShotProbability(stateSpace, currState, shooterPos)
+function P_SHOT = ComputeShotProbability(stateSpace, currStateIndex, shooterPos)
 % ComputeShotProbability Compute the probability of being shot
 %
 %   P_SHOT = ComputeShotProbability(stateSpace, map, currState, shooterPos)
@@ -24,8 +24,8 @@ global NORTH SOUTH EAST WEST HOVER
 global K TERMINAL_STATE_INDEX
 
 %% parse information
-currM = stateSpace(currState, 1); % current state in m
-currN = stateSpace(currState, 2); % current state in n
+currM = stateSpace(currStateIndex, 1); % current state in m
+currN = stateSpace(currStateIndex, 2); % current state in n
 numShooter = size(shooterPos, 1); % shooter number
 
 %% compute distance
