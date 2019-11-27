@@ -139,9 +139,7 @@ for i = 1:K % iterate starting state
     end
 end
 
-% note that it is impossible that the drone is at pick-up position but not
-% carrying a package, comment this loop if you want the same result as
-% exampleP.mat
+% if you end up at pick-up position, you must be carrying a package
 for j = 1:K % iteratre ending state
     for k = [NORTH, SOUTH, EAST, WEST, HOVER] % iterate actions
         P(pickIndex0,j,k) = 0;
