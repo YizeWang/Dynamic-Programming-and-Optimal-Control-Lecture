@@ -83,7 +83,7 @@ transitionProbabilitiesImplemented = true;
 stageCostsImplemented = true;
 valueIterationImplemented = true; 
 policyIterationImplemented = true;
-linearProgrammingImplemented = false;
+linearProgrammingImplemented = true;
 
 %% Compute the terminal state index
 global TERMINAL_STATE_INDEX %#ok<*NUSED>
@@ -136,7 +136,7 @@ if linearProgrammingImplemented
     if size(J_opt_lp,1)~=K || size(u_opt_ind_lp,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
-    disp("Solve stochastic shortest path problem with Linear Programming" + toc(startTime) + " sec");
+    disp("Solve stochastic shortest path problem with Linear Programming: " + toc(startTime) + " sec");
 end
 
 %% Plot results
