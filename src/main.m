@@ -2,20 +2,14 @@
 % Fall 2019
 % Programming Exercise
 %
-% Solution by Yize Wang
-%
-% ------
-% ETH Zurich
-% Institute for Dynamic Systems and Control
-% Nikita Rudin
-% rudinn@ethz.ch
-% David Hoeller
-% dhoeller@ethz.ch
+% Author: Yize Wang
+% Email: yizwang@student.ethz.ch
 
 %% Clear workspace and command window
 clc;
 clear all;
 close all;
+tic % start stopwatch
 
 %% Options
 mapSize = [15, 20]; % [M, N]
@@ -84,7 +78,7 @@ K = size(stateSpace,1);
 %% Set the following to true as you progress with the files
 transitionProbabilitiesImplemented = true;
 stageCostsImplemented = true;
-valueIterationImplemented = false; 
+valueIterationImplemented = true; 
 policyIterationImplemented = false;
 linearProgrammingImplemented = false;
 
@@ -107,32 +101,29 @@ if stageCostsImplemented
 end
 
 %% Solve stochastic shortest path problem
-% Solve the stochastic shortest path problem by Value Iteration,
-% Policy Iteration, and Linear Programming
+% value iteration
 if valueIterationImplemented
     disp('Solve stochastic shortest path problem with Value Iteration');
-    
-    % TODO: Question d)
     [ J_opt_vi, u_opt_ind_vi ] = ValueIteration(P, G);
     
     if size(J_opt_vi,1)~=K || size(u_opt_ind_vi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
 end
+
+% policy iteration
 if policyIterationImplemented
     disp('Solve stochastic shortest path problem with Policy Iteration');
-    
-    % TODO: Question d)
     [ J_opt_pi, u_opt_ind_pi ] = PolicyIteration(P, G);
     
     if size(J_opt_pi,1)~=K || size(u_opt_ind_pi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
 end
+
+% linear programming
 if linearProgrammingImplemented
     disp('Solve stochastic shortest path problem with Linear Programming');
-    
-    % TODO: Question d)
     [ J_opt_lp, u_opt_ind_lp ] = LinearProgramming(P, G);
     
     if size(J_opt_lp,1)~=K || size(u_opt_ind_lp,1)~=K
@@ -154,12 +145,4 @@ end
 
 %% Terminated
 disp('Terminated');
-
-myP = P;
-load('exampleP.mat')
-
-myG = G;
-load('exampleG.mat');
-
-CompareResultP(P,myP)
-CompareResultG(G,myG)
+toc % stop stopwatch
