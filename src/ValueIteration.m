@@ -33,10 +33,11 @@ global TERMINAL_STATE_INDEX
 %% initialize variables
 tol = 1e-5; % error tolerance
 error = intmax; % initial error
-u_opt_ind = zeros(K, 1); % optimal control vector
+u_opt_ind = HOVER * ones(K, 1); % optimal control vector
 J_opt = zeros(K, 1); % optimal cost-to-go vector
 J_prev = zeros(K, 1); % previous optimal cost-to-go vector
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
+nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K]';
 
 %% start iteration
 % Note: We do not have to deal with the terminal state explicitly because
@@ -45,7 +46,7 @@ while(error > tol)
     % construct J_opt_temp: the k-th column indicates the cost-to-go vector
     % after applying control k
     for k  = 1:5
-        J_opt_temp(:,k) = G(:,k) + P(:,:,k) * J_opt;
+        J_opt_temp(nonTerminalState,k) = G(nonTerminalState,k) + P(nonTerminalState,nonTerminalState,k) * J_opt(nonTerminalState);
     end
     % compute optimal cost-to-go and optimal control
     [J_opt, u_opt_ind] = min(J_opt_temp, [], 2);
