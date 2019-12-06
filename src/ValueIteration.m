@@ -35,7 +35,7 @@ tol = 1e-5; % error tolerance
 error = intmax; % initial error
 u_opt_ind = zeros(K, 1); % optimal control vector
 J_opt = zeros(K, 1); % optimal cost-to-go vector
-J_opt_prev = zeros(K, 1); % previous optimal cost-to-go vector
+J_prev = zeros(K, 1); % previous optimal cost-to-go vector
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
 
 %% start iteration
@@ -50,9 +50,9 @@ while(error > tol)
     % compute optimal cost-to-go and optimal control
     [J_opt, u_opt_ind] = min(J_opt_temp, [], 2);
     % update error
-    error = max(J_opt - J_opt_prev);
+    error = max(J_opt - J_prev);
     % store optimal cost-to-go after this iteration
-    J_opt_prev = J_opt;
+    J_prev = J_opt;
 end
 
 end

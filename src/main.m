@@ -82,7 +82,7 @@ disp("Generate state space: " + toc(startTime) + " sec");
 transitionProbabilitiesImplemented = true;
 stageCostsImplemented = true;
 valueIterationImplemented = true; 
-policyIterationImplemented = false;
+policyIterationImplemented = true;
 linearProgrammingImplemented = false;
 
 %% Compute the terminal state index
