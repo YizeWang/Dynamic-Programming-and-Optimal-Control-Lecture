@@ -114,7 +114,7 @@ if valueIterationImplemented
     if size(J_opt_vi,1)~=K || size(u_opt_ind_vi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
-    disp("Solve stochastic shortest path problem with Value Iteration " + toc(startTime) + " sec");
+    disp("Solve stochastic shortest path problem with Value Iteration: " + toc(startTime) + " sec");
 end
 
 % policy iteration
@@ -125,7 +125,7 @@ if policyIterationImplemented
     if size(J_opt_pi,1)~=K || size(u_opt_ind_pi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
-    disp("Solve stochastic shortest path problem with Policy Iteration" + toc(startTime) + " sec");
+    disp("Solve stochastic shortest path problem with Policy Iteration: " + toc(startTime) + " sec");
 end
 
 % linear programming
