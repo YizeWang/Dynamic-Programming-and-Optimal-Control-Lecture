@@ -50,7 +50,9 @@ end
 b(isinf(b)) = 1e5;
 
 %% compute J_opt and u_opt_ind
-J_opt(nonTerminalState) = linprog(f, A, b);
+options = optimset('linprog');
+options.Display = 'off';
+J_opt(nonTerminalState) = linprog(f, A, b, [], [], [], [], options);
 for k  = 1:5
     J_opt_temp(nonTerminalState,k) = G(nonTerminalState,k) + P(nonTerminalState,nonTerminalState,k) * J_opt(nonTerminalState);
 end

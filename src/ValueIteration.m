@@ -33,10 +33,10 @@ global TERMINAL_STATE_INDEX
 %% initialize variables
 tol = 1e-5; % error tolerance
 error = intmax; % initial error
-u_opt_ind = HOVER * ones(K, 1); % optimal control vector
 J_opt = zeros(K, 1); % optimal cost-to-go vector
 J_prev = zeros(K, 1); % previous optimal cost-to-go vector
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
+u_opt_ind = HOVER * ones(K, 1); % optimal control vector
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K];
 
 %% start iteration

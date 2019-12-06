@@ -31,11 +31,11 @@ global K HOVER
 global TERMINAL_STATE_INDEX
 
 %% initialize variables
-J_opt = zeros(K, 1); % initialize optimal cost
-u_opt_ind = HOVER * ones(K, 1); % initialize optimal control with Hover
-J_prev = rand(K, 1); % initialize with an infinite vector
 P_u = zeros(K, K); % inialize coefficent matrix postmultiplied by J given policy
+J_opt = zeros(K, 1); % initialize optimal cost
+J_prev = rand(K, 1); % initialize with an infinite vector
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
+u_opt_ind = HOVER * ones(K, 1); % initialize optimal control with Hover
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K]; % all index except terminal state
 
 %% start iteration
