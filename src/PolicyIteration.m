@@ -1,6 +1,6 @@
-function [ J_opt, u_opt_ind ] = PolicyIteration( P, G )
-%POLICYITERATION Policy iteration
-%   Solve a stochastic shortest path problem by Policy Iteration.
+function [J_opt, u_opt_ind] = PolicyIteration( P, G )
+% POLICYITERATION Policy iteration
+% Solve a stochastic shortest path problem by Policy Iteration.
 %
 %   [J_opt, u_opt_ind] = PolicyIteration(P, G) computes the optimal cost and
 %   the optimal control input for each state of the state space.
@@ -30,11 +30,10 @@ function [ J_opt, u_opt_ind ] = PolicyIteration( P, G )
 %       	input for each element of the state space. Mapping of the
 %       	terminal state is arbitrary (for example: HOVER).
 
+%% declare global variables
 global K HOVER
-
-%% Handle terminal state
-% Do yo need to do something with the teminal state before starting policy
-% iteration?
 global TERMINAL_STATE_INDEX
+
+%% start iteration
 
 end

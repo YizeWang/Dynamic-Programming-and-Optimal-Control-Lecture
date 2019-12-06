@@ -9,7 +9,9 @@
 clc;
 clear all;
 close all;
-tic % start stopwatch
+
+%% Initialize stopwatches
+mainStart = tic;
 
 %% Options
 mapSize = [15, 20]; % [M, N]
@@ -58,7 +60,7 @@ end
 MakePlots(map);
 
 %% Generate state space
-disp('Generate state space');
+startTime = tic;
 % Generate a (K x 3) - matrix 'stateSpace', where each accessible cell is
 % represented by two rows (with and without carrying a package).
 stateSpace = [];
@@ -74,6 +76,7 @@ end
 % State space size
 global K
 K = size(stateSpace,1);
+disp("Generate state space: " + toc(startTime) + " sec");
 
 %% Set the following to true as you progress with the files
 transitionProbabilitiesImplemented = true;
@@ -90,49 +93,54 @@ end
 
 %% Compute transition probabilities
 if transitionProbabilitiesImplemented
-    disp('Compute transition probabilities');
+    startTime = tic;
     P = ComputeTransitionProbabilities(stateSpace, map);
+    disp("Compute transition probabilities: " + toc(startTime) + " sec");
 end
 
 %% Compute stage costs
 if stageCostsImplemented 
-    disp('Compute stage costs');
+    startTime = tic;
     G = ComputeStageCosts(stateSpace, map);
+    disp("Compute stage costs: " + toc(startTime) + " sec");
 end
 
 %% Solve stochastic shortest path problem
 % value iteration
 if valueIterationImplemented
-    disp('Solve stochastic shortest path problem with Value Iteration');
+    startTime = tic;
     [ J_opt_vi, u_opt_ind_vi ] = ValueIteration(P, G);
     
     if size(J_opt_vi,1)~=K || size(u_opt_ind_vi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
+    disp("Solve stochastic shortest path problem with Value Iteration " + toc(startTime) + " sec");
 end
 
 % policy iteration
 if policyIterationImplemented
-    disp('Solve stochastic shortest path problem with Policy Iteration');
+    startTime = tic;
     [ J_opt_pi, u_opt_ind_pi ] = PolicyIteration(P, G);
     
     if size(J_opt_pi,1)~=K || size(u_opt_ind_pi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
+    disp("Solve stochastic shortest path problem with Policy Iteration" + toc(startTime) + " sec");
 end
 
 % linear programming
 if linearProgrammingImplemented
-    disp('Solve stochastic shortest path problem with Linear Programming');
+    startTime = tic;
     [ J_opt_lp, u_opt_ind_lp ] = LinearProgramming(P, G);
     
     if size(J_opt_lp,1)~=K || size(u_opt_ind_lp,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
+    disp("Solve stochastic shortest path problem with Linear Programming" + toc(startTime) + " sec");
 end
 
 %% Plot results
-disp('Plot results');
+startTime = tic;
 if valueIterationImplemented
     MakePlots(map, stateSpace, J_opt_vi, u_opt_ind_vi, 'Value iteration');
 end
@@ -142,7 +150,7 @@ end
 if linearProgrammingImplemented
     MakePlots(map, stateSpace, J_opt_lp, u_opt_ind_lp, 'Linear programming');
 end
+disp("Plot results " + toc(startTime) + " sec");
 
 %% Terminated
-disp('Terminated');
-toc % stop stopwatch
+disp("Terminated: " + toc(mainStart) + " sec");

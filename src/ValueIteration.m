@@ -38,7 +38,9 @@ J_opt = zeros(K, 1); % optimal cost-to-go vector
 J_opt_prev = zeros(K, 1); % previous optimal cost-to-go vector
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
 
-%% Handle terminal state
+%% start iteration
+% Note: We do not have to deal with the terminal state explicitly because
+% the probability of leaving remains zero for all the time
 while(error > tol)
     % construct J_opt_temp: the k-th column indicates the cost-to-go vector
     % after applying control k
