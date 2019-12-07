@@ -40,7 +40,7 @@ u_opt_ind = HOVER * ones(K, 1); % optimal control vector
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K];
 
 %% start iteration
-while(error > tol)
+while( error > tol )
     % construct J_opt_temp: the k-th column indicates the cost-to-go vector after applying control k
     for k  = 1:5
         J_opt_temp(nonTerminalState,k) = G(nonTerminalState,k) + P(nonTerminalState,nonTerminalState,k) * J_opt(nonTerminalState);
@@ -48,7 +48,7 @@ while(error > tol)
     % compute optimal cost-to-go and optimal control
     [J_opt, u_opt_ind] = min(J_opt_temp, [], 2);
     % update error
-    error = max(J_opt - J_prev);
+    error = max(abs(J_opt - J_prev));
     % store optimal cost-to-go after this iteration
     J_prev = J_opt;
 end

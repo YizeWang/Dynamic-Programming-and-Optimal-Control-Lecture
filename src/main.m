@@ -160,9 +160,11 @@ disp("Total Time: " + toc(mainStart) + " sec");
 
 %% Compare
 % compute maximum error to verify algorithm implementation correctness
-maxError = max(max(abs(J_opt_pi-J_opt_lp))+max(abs(J_opt_pi-J_opt_vi))+max(abs(J_opt_vi-J_opt_lp)));
-if maxError < 1e-4
-    fprintf('\nCongradulations! Three Methods Yield Same Result! \n')
-else
-    fprintf('\nWaring! Three Methods Yield Different Result! \n')
+if valueIterationImplemented && policyIterationImplemented && linearProgrammingImplemented
+    maxError = max(max(abs(J_opt_pi-J_opt_lp))+max(abs(J_opt_pi-J_opt_vi))+max(abs(J_opt_vi-J_opt_lp)));
+    if maxError < 1e-4
+        fprintf('\nCongradulations! Three Methods Yield Same Result! \n')
+    else
+        fprintf('\nWaring! Three Methods Yield Different Result! \n')
+    end
 end

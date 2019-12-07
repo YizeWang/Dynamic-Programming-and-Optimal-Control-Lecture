@@ -9,4 +9,3 @@ This repository stores my programming exercises for the Dynamic Programming and 
 ## Usage
 
 - run `main.m`
-

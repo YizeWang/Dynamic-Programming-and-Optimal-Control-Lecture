@@ -31,6 +31,8 @@ global K HOVER
 global TERMINAL_STATE_INDEX
 
 %% initialize variables
+tol = 1e-6; % error tolerance
+error = intmax; % initial error
 P_J = zeros(K, K); % inialize coefficent matrix postmultiplied by J given policy
 J_opt = zeros(K, 1); % initialize optimal cost with zero vector
 J_prev = ones(K, 1); % initialize with an infinite vector
@@ -39,7 +41,7 @@ u_opt_ind = HOVER * ones(K, 1); % initialize optimal control with Hover
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K]; % all index except terminal state
 
 %% start iteration
-while( ~isequal(J_opt,J_prev) )
+while( error > tol )
     % update J_prev
     J_prev = J_opt;
     % compute index of elements in G that will end up in q
@@ -60,6 +62,8 @@ while( ~isequal(J_opt,J_prev) )
         J_opt_temp(:,k) = G(:,k) + P(:,:,k) * J_opt;
     end
     [~, u_opt_ind] = min(J_opt_temp, [], 2);
+    % update error
+    error = max(abs(J_opt - J_prev));
 end
 
 end
