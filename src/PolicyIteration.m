@@ -31,9 +31,9 @@ global K HOVER
 global TERMINAL_STATE_INDEX
 
 %% initialize variables
-P_u = zeros(K, K); % inialize coefficent matrix postmultiplied by J given policy
-J_opt = zeros(K, 1); % initialize optimal cost
-J_prev = rand(K, 1); % initialize with an infinite vector
+P_J = zeros(K, K); % inialize coefficent matrix postmultiplied by J given policy
+J_opt = zeros(K, 1); % initialize optimal cost with zero vector
+J_prev = ones(K, 1); % initialize with an infinite vector
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
 u_opt_ind = HOVER * ones(K, 1); % initialize optimal control with Hover
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K]; % all index except terminal state
@@ -45,12 +45,12 @@ while( ~isequal(J_opt,J_prev) )
     % compute index of elements in G that will end up in q
     G_ind = sub2ind([K,5], 1:K, u_opt_ind'); % compute index from G
     q = G(G_ind)'; % stage cost vector given current policy
-    % construct P_u matrix postmultiplied by J given current policy
+    % construct P_J matrix postmultiplied by J given current policy
     for i = 1:K
-        P_u(i,:) = P(i,:,u_opt_ind(i));
+        P_J(i,:) = P(i,:,u_opt_ind(i));
     end
     % solve J_opt using linear equation solver
-    A = eye(K-1) - P_u(nonTerminalState,nonTerminalState); % A matrix
+    A = eye(K-1) - P_J(nonTerminalState,nonTerminalState); % A matrix
     b = q(nonTerminalState); % b vector
     J_opt(nonTerminalState) = linsolve(A,b);
     % policy improvement

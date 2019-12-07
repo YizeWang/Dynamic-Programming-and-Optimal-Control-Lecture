@@ -17,7 +17,7 @@ mainStart = tic;
 mapSize = [15, 20]; % [M, N]
 % Set to true to generate a random map of size mapSize, else set to false
 % to load the pre-exsisting example map
-generateRandomWorld = false;
+generateRandomWorld = true;
 
 % Plotting options
 global PLOT_POLICY PLOT_COST
@@ -49,8 +49,8 @@ WEST = 4;
 HOVER = 5;
 
 %% Generate map
+startTime = tic;
 % map(m,n) represents the cell at indices (m,n) according to the axes
-disp('Generate map');
 if generateRandomWorld
 	map = GenerateWorld(mapSize(1), mapSize(2)); %#ok<*UNRCH>
 else
@@ -58,6 +58,7 @@ else
     load('exampleWorld.mat');
 end
 MakePlots(map);
+disp("Generate Map: " + toc(startTime) + " sec");
 
 %% Generate state space
 startTime = tic;
@@ -73,10 +74,11 @@ for m = 1 : size(map, 1)
         end
     end
 end
+
 % State space size
 global K
 K = size(stateSpace,1);
-disp("Generate state space: " + toc(startTime) + " sec");
+disp("Generate State Space: " + toc(startTime) + " sec");
 
 %% Set the following to true as you progress with the files
 transitionProbabilitiesImplemented = true;
@@ -95,14 +97,14 @@ end
 if transitionProbabilitiesImplemented
     startTime = tic;
     P = ComputeTransitionProbabilities(stateSpace, map);
-    disp("Compute transition probabilities: " + toc(startTime) + " sec");
+    disp("Compute Transition Probabilities: " + toc(startTime) + " sec");
 end
 
 %% Compute stage costs
 if stageCostsImplemented 
     startTime = tic;
     G = ComputeStageCosts(stateSpace, map);
-    disp("Compute stage costs: " + toc(startTime) + " sec");
+    disp("Compute Stage Costs: " + toc(startTime) + " sec");
 end
 
 %% Solve stochastic shortest path problem
@@ -114,7 +116,7 @@ if valueIterationImplemented
     if size(J_opt_vi,1)~=K || size(u_opt_ind_vi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
-    disp("Solve stochastic shortest path problem with Value Iteration: " + toc(startTime) + " sec");
+    disp("Value Iteration: " + toc(startTime) + " sec");
 end
 
 % policy iteration
@@ -125,7 +127,7 @@ if policyIterationImplemented
     if size(J_opt_pi,1)~=K || size(u_opt_ind_pi,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
-    disp("Solve stochastic shortest path problem with Policy Iteration: " + toc(startTime) + " sec");
+    disp("Policy Iteration: " + toc(startTime) + " sec");
 end
 
 % linear programming
@@ -136,7 +138,7 @@ if linearProgrammingImplemented
     if size(J_opt_lp,1)~=K || size(u_opt_ind_lp,1)~=K
         disp('[ERROR] the size of J and u must be K')
     end
-    disp("Solve stochastic shortest path problem with Linear Programming: " + toc(startTime) + " sec");
+    disp("Linear Programming: " + toc(startTime) + " sec");
 end
 
 %% Plot results
@@ -150,7 +152,17 @@ end
 if linearProgrammingImplemented
     MakePlots(map, stateSpace, J_opt_lp, u_opt_ind_lp, 'Linear programming');
 end
-disp("Plot results " + toc(startTime) + " sec");
+disp("Plot results: " + toc(startTime) + " sec");
 
 %% Terminated
-disp("Terminated: " + toc(mainStart) + " sec");
+disp("Computation Time: " + (toc(mainStart) - toc(startTime)) + " sec");
+disp("Total Time: " + toc(mainStart) + " sec");
+
+%% Compare
+% compute maximum error to verify algorithm implementation correctness
+maxError = max(max(abs(J_opt_pi-J_opt_lp))+max(abs(J_opt_pi-J_opt_vi))+max(abs(J_opt_vi-J_opt_lp)));
+if maxError < 1e-4
+    fprintf('\nCongradulations! Three Methods Yield Same Result! \n')
+else
+    fprintf('\nWaring! Three Methods Yield Different Result! \n')
+end

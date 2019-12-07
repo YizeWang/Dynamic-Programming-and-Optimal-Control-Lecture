@@ -25,10 +25,7 @@ function [isCrashed, nextStateIndex] = FindNextStateIndex(stateSpace, baseIndex,
 %           would be tree or outside map
 
 %% declare global variables
-global GAMMA R P_WIND
-global FREE TREE SHOOTER PICK_UP DROP_OFF BASE
 global NORTH SOUTH EAST WEST HOVER
-global K TERMINAL_STATE_INDEX
 
 %% parse information
 isCrashed = false; % not crashed by default

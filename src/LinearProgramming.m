@@ -27,15 +27,13 @@ function [J_opt, u_opt_ind] = LinearProgramming(P, G)
 %       	terminal state is arbitrary (for example: HOVER).
 
 %% declare global variables
-global K HOVER
+global K
 global TERMINAL_STATE_INDEX
 
 %% initialize variables
 J_opt = zeros(K, 1); % initialize optimal cost
 J_opt_temp = zeros(K, 5); % store temporary cost-to-go matrix
-u_opt_ind = HOVER * ones(K, 1); % initialize optimal control with Hover
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K]; % all index except terminal state
-
 
 %% compute optimization input variables
 A = []; % A in linprog function
@@ -46,8 +44,8 @@ for k = 1:5
     A = [A; eye(K-1)-P(nonTerminalState,nonTerminalState,k)];
     b = [b; G(nonTerminalState,k)];
 end
-% modify b vector: inf -> 1e5
-b(isinf(b)) = 1e5;
+% modify b vector: inf -> 1e6 because linear programming cannot deal with inf
+b(isinf(b)) = 1e6;
 
 %% compute J_opt and u_opt_ind
 options = optimset('linprog');

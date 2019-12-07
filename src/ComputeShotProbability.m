@@ -18,10 +18,7 @@ function P_SHOT = ComputeShotProbability(stateSpace, currStateIndex, shooterPos)
 %       The probability of beging shot by a angry resident
 
 %% declare global variables
-global GAMMA R P_WIND
-global FREE TREE SHOOTER PICK_UP DROP_OFF BASE
-global NORTH SOUTH EAST WEST HOVER
-global K TERMINAL_STATE_INDEX
+global GAMMA R
 
 %% parse information
 currM = stateSpace(currStateIndex, 1); % current state in m

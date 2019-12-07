@@ -31,7 +31,7 @@ global K HOVER
 global TERMINAL_STATE_INDEX
 
 %% initialize variables
-tol = 1e-5; % error tolerance
+tol = 1e-6; % error tolerance
 error = intmax; % initial error
 J_opt = zeros(K, 1); % optimal cost-to-go vector
 J_prev = zeros(K, 1); % previous optimal cost-to-go vector
@@ -40,11 +40,8 @@ u_opt_ind = HOVER * ones(K, 1); % optimal control vector
 nonTerminalState = [1:TERMINAL_STATE_INDEX-1 TERMINAL_STATE_INDEX+1:K];
 
 %% start iteration
-% Note: We do not have to deal with the terminal state explicitly because
-% the probability of leaving remains zero for all the time
 while(error > tol)
-    % construct J_opt_temp: the k-th column indicates the cost-to-go vector
-    % after applying control k
+    % construct J_opt_temp: the k-th column indicates the cost-to-go vector after applying control k
     for k  = 1:5
         J_opt_temp(nonTerminalState,k) = G(nonTerminalState,k) + P(nonTerminalState,nonTerminalState,k) * J_opt(nonTerminalState);
     end
