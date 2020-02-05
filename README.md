@@ -4,7 +4,7 @@ This repository stores my programming exercises for the Dynamic Programming and 
 
 ## Evaluation
 
-- submitted - not graded yet
+- Full grade granted
 
 ## Requirement
 
